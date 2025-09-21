@@ -1,13 +1,17 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+# from django.http import HttpResponse
 
 
 def index(request):
-    return HttpResponse("こんにちは")
-
-def hobby(request):
-    return HttpResponse("私の趣味は吹奏楽です。")
-
-def greet(request, name):
-    message = "こんにちは" + name + "さん"
-    return HttpResponse(message)
+    question_list = [
+        "プログラミングは好きですか？",
+        "数学は好きですか？",
+        "国語は好きですか？",
+    ]
+    context = {
+        "question_list": question_list,  # list 型を渡す
+        "is_polled": False,
+        "polled_msg": "投票ありがとうございました。",
+        "not_polled_msg": "投票をお願いします。",
+    }
+    return render(request, "main/index.html", context)
