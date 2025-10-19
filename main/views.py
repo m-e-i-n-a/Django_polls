@@ -1,17 +1,33 @@
-from django.shortcuts import render
-# from django.http import HttpResponse
-
+from django.shortcuts import render, redirect
+from .models import Question,Choice
 
 def index(request):
-    question_list = [
-        "プログラミングは好きですか？",
-        "数学は好きですか？",
-        "国語は好きですか？",
-    ]
+    all_question = Question.objects.all()
+
     context = {
-        "question_list": question_list,  # list 型を渡す
-        "is_polled": False,
-        "polled_msg": "投票ありがとうございました。",
-        "not_polled_msg": "投票をお願いします。",
+        "all_question": all_question,
     }
+    
     return render(request, "main/index.html", context)
+
+def detail(request, question_id):
+    question = Question.objects.get(pk=question_id)
+    context = {
+        "question": question,
+    }
+
+    return render(request, "main/detail.html", context)
+
+def vote(request, question_id):
+    question = Question.objects.get(pk=question_id)
+    try:
+        selected_choice = question.choices.get(pk=request.POST['choice'])
+    except (KeyError, Choice.DoesNotExist):
+        return render(request, 'main/detail.html',{
+            'question':question,
+            'error_message':"You didn't detail a choice",
+        })
+    else:
+        selected_choice.votes += 1
+        selected_choice.save()
+    return redirect("detail", question_id)
